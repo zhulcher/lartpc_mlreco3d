@@ -527,7 +527,7 @@ class GNNLoss(torch.nn.modules.loss._Loss):
             self.RETURNS.update(self.edge_loss.RETURNS)
 
 
-    def forward(self, result, clust_label, graph=None, node_label=None, iteration=None):
+    def forward(self, result, clust_label,coords=None, graph=None, node_label=None, iteration=None):
 
         # Apply edge and node losses, if instantiated
         loss = {}
@@ -535,9 +535,9 @@ class GNNLoss(torch.nn.modules.loss._Loss):
             if node_label is None:
                 node_label = clust_label
             if iteration is not None:
-                node_loss = self.node_loss(result, node_label, iteration=iteration)
+                node_loss = self.node_loss(result, node_label, coords, iteration=iteration)
             else:
-                node_loss = self.node_loss(result, node_label)
+                node_loss = self.node_loss(result, node_label,coords)
             loss.update(node_loss)
             loss['node_loss'] = node_loss['loss']
             loss['node_accuracy'] = node_loss['accuracy']

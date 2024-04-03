@@ -180,14 +180,15 @@ def node_loss_dict():
         dict: Dictionary of valid node losses
     """
 
-    from .losses import node_kinematics, node_primary, node_type
+    from .losses import node_kinematics, node_primary, node_type, node_orientation
 
     losses = {
         "kinematics"     : node_kinematics.NodeKinematicsLoss,
         "kinematics_edl" : node_kinematics.NodeEvidentialKinematicsLoss,
         "kinematics_attn": node_kinematics.NodeTransformerLoss,
         "primary"        : node_primary.NodePrimaryLoss,
-        "type"           : node_type.NodeTypeLoss
+        "type"           : node_type.NodeTypeLoss,
+        "orientation"    : node_orientation.NodeOrientationLoss
     }
 
     return losses
