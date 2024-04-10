@@ -2,8 +2,10 @@ import scipy
 import numpy as np
 import numba as nb
 
-from .globals import LAR_X0
+from .globals import LAR_X0, MUON_MASS,PION_MASS,KAON_MASS,PROT_MASS
 from .energy_loss import step_energy_loss_lar
+
+from mlreco.utils.tracking import get_track_segments
 
 
 def mcs_fit(theta, M, dx, z = 1, \
@@ -157,3 +159,54 @@ def split_angles(theta):
 
     # If theta is over pi/2, must flip the angles
     return theta1, theta2
+
+
+
+def get_track_angles(points,start,dx=5):
+    if len(points)==0: return []
+    _, dirs, _ = get_track_segments(points, dx, start)
+    costh = np.sum(dirs[:-1] * dirs[1:], axis = 1)
+    costh = np.clip(costh, -1, 1)
+    return np.arccos(costh)
+        
+def MCS_Mass(theta,KE,dx=5): 
+    #for some reason the scipy minimizer is not working well :( 
+    #This is a super hacky way around it 
+
+    #almost certainly need to correct for missing energy in calo KE vs truth KE
+
+    err=np.inf
+    retmass=np.nan
+    for mass in np.logspace(1, 3.1, num=50):
+        new_err=mcs_nll_lar(KE, theta, mass, dx)
+        if new_err<err: retmass=mass
+    return retmass
+def best_MCS_Mass(theta,KE,dx,test=[MUON_MASS,PION_MASS,PROT_MASS,KAON_MASS]):
+    err=np.inf
+    retmass=np.nan
+    for mass in test:
+        new_err=mcs_nll_lar(KE, theta, mass, dx)
+        if new_err<err: retmass=mass
+    return retmass
+
+def proj_dEdx(points,depositions,start,end):
+    if np.linalg.norm(end-start)==0: return None,None
+    
+    start=np.array(start)
+    end=np.array(end)
+    projlist=[]
+    for i in points:
+        pt=np.array(i)
+        projlist+=[np.dot(end-pt,end-start)/np.linalg.norm(end-start)] #distance from the end point
+    projlist=np.array(projlist)
+    E=np.array(depositions.copy())
+    projlist=projlist[E>0]
+    E=E[E>0]
+    
+    E=np.array([x for _, x in sorted(zip(projlist, E))])
+    projlist=np.array(sorted(projlist))
+    
+    return projlist,E
+
+def PIDA_integrated(projlist,E):
+    return np.median(projlist**(.42-1)*(1-.42)*E)
