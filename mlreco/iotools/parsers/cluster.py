@@ -142,7 +142,7 @@ def parse_cluster3d(cluster_event,
     if add_particle_info:
         assert particle_event is not None,\
                 'Must provide particle tree if particle information is included'
-        num_particles = particle_event.size()
+        num_particles = particle_event.as_vector().size()
         assert num_particles == num_clusters or num_particles == num_clusters-1,\
                 'The number of particles must be aligned with the number of clusters'
 
