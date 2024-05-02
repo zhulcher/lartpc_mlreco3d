@@ -73,7 +73,7 @@ class HDF5Reader:
 
                 # If requested, register the [run, event] information pair
                 if create_run_map:
-                    source = in_file['data'] if split_groups else in_file
+                    source = in_file['data'] if 'data' in in_file else in_file
                     assert 'run_info' in source, \
                             'Must provide run info to create run map'
                     run_info = source['run_info']
