@@ -1,6 +1,6 @@
 import numpy as np
 
-from .globals import (TRACK_SHP, MICHL_SHP, DELTA_SHP, INVAL_ID,
+from .globals import (TRACK_SHP, MICHL_SHP, DELTA_SHP, INVAL_ID, OLD_INVAL_ID,
                       INVAL_TID, PDG_TO_PID)
 
 
@@ -28,8 +28,9 @@ def get_valid_mask(particles):
 
     # If the interaction IDs are set in the particle tree, simply use that
     inter_ids = np.array([p.interaction_id() for p in particles], dtype=np.int32)
-    if np.any(inter_ids != INVAL_ID):
-        return inter_ids != INVAL_ID
+    valid_mask = (inter_ids != INVAL_ID) & (inter_ids != OLD_INVAL_ID)
+    if np.any(valid_mask):
+        return valid_mask
 
     # Otherwise, check that the ancestor track ID and creation process are valid
     mask  = np.array([p.ancestor_track_id() != INVAL_TID for p in particles])
@@ -67,7 +68,7 @@ def get_interaction_ids(particles):
 
     # If the interaction IDs are set in the particle tree, simply use that
     inter_ids = np.array([p.interaction_id() for p in particles], dtype=np.int32)
-    if np.any(inter_ids != INVAL_ID):
+    if np.any((inter_ids != INVAL_ID) & (inter_ids != OLD_INVAL_ID)):
         inter_ids[~valid_mask] = -1
         return inter_ids
 
@@ -230,7 +231,7 @@ def get_shower_primary_ids(particles):
     for g in np.unique(group_ids):
         # If the particle group has invalid labeling or if it is a track
         # group, the concept of shower primary is ill-defined
-        if (g == INVAL_ID or
+        if (g == INVAL_ID or g == OLD_INVAL_ID or
             not valid_mask[g] or
             particles[g].shape() == TRACK_SHP):
             group_index = np.where(group_ids == g)[0]
@@ -275,7 +276,7 @@ def get_group_primary_ids(particles, nu_ids=None, include_mpr=True):
     valid_mask  = get_valid_mask(particles)
     for i, p in enumerate(particles):
         # If the particle has invalid labeling, it has invalid primary status
-        if p.group_id() == INVAL_ID or not valid_mask[i]:
+        if p.group_id() == INVAL_ID or p.group_id() == OLD_INVAL_ID or not valid_mask[i]:
             continue
 
         # If MPR particles are not included and the nu_id < 0, assign invalid
