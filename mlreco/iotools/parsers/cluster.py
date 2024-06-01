@@ -242,6 +242,7 @@ def parse_cluster3d_charge_rescaled(cluster_event,
                                     type_include_secondary = False,
                                     primary_include_mpr = True,
                                     break_clusters = False,
+                                    break_clusters_eps = 1.1,
                                     min_size = -1,
                                     collection_only=False):
 
@@ -259,6 +260,7 @@ def parse_cluster3d_charge_rescaled(cluster_event,
                                              type_include_secondary,
                                              primary_include_mpr,
                                              break_clusters,
+                                             break_clusters_eps,
                                              min_size)
 
     from .sparse import parse_sparse3d_charge_rescaled
@@ -280,6 +282,7 @@ def parse_cluster3d_2cryos(cluster_event,
                                     type_include_secondary = False,
                                     primary_include_mpr = True,
                                     break_clusters = False,
+                                    break_clusters_eps = 1.1,
                                     min_size = -1):
 
     # Produces cluster3d labels with sparse3d_reco_rescaled on the fly on datasets that do not have it
@@ -296,6 +299,7 @@ def parse_cluster3d_2cryos(cluster_event,
                                              type_include_secondary,
                                              primary_include_mpr,
                                              break_clusters,
+                                             break_clusters_eps,
                                              min_size)
 
     from .sparse import parse_sparse3d_charge_rescaled
