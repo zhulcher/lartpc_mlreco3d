@@ -302,7 +302,7 @@ def parse_cluster3d_2cryos(cluster_event,
                                              break_clusters_eps,
                                              min_size)
 
-    from .sparse import parse_sparse3d_charge_rescaled
+    from .sparse import parse_sparse3d
     _, charge0 = parse_sparse3d([sparse_value_event_list[0]])
     _, charge1 = parse_sparse3d([sparse_value_event_list[1]])
     charge0[charge0 == 0.] = charge1[charge0 == 0.]
