@@ -73,6 +73,7 @@ class Interaction:
                  flash_time: float = -np.inf,
                  flash_total_pE: float = -1.0,
                  flash_hypothesis: float = -1.0,
+                 flash_xoffset: float = -np.inf,
                  matched: bool = False,
                  is_contained: bool = False,
                  is_fiducial: bool = False,
@@ -132,6 +133,8 @@ class Interaction:
         self.flash_time       = flash_time
         self.flash_total_pE   = flash_total_pE
         self.flash_hypothesis = flash_hypothesis
+        self.flash_xoffset    = flash_xoffset
+
 
         # CRT-TPC matching quantities
         self.crthit_matched = crthit_matched
