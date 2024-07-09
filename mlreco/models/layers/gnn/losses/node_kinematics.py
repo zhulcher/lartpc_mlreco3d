@@ -138,6 +138,7 @@ class NodeKinematicsLoss(torch.nn.Module):
         self.use_anchor_points = loss_config.get('use_anchor_points', False)
         self.max_vertex_distance = loss_config.get('max_vertex_distance', 50)
         self.type_num_classes = loss_config.get('type_num_classes', 5)
+        self.type_weights = loss_config.get('type_weights', None)
         self.type_loss_weight = loss_config.get('type_loss_weight', 1.0)
         self.type_high_purity = loss_config.get('type_high_purity', True)
         self.momentum_high_purity = loss_config.get('momentum_high_purity', True)
@@ -215,8 +216,12 @@ class NodeKinematicsLoss(torch.nn.Module):
                         node_pred_type = node_pred_type[valid_mask_type]
                         node_assn_type = torch.tensor(node_assn_type[valid_mask_type], dtype=torch.long, device=node_pred_type.device, requires_grad=False)
                         if self.balance_classes:
-                            vals, counts = torch.unique(node_assn_type, return_counts=True)
-                            weights = len(node_assn_type)/len(counts)/counts
+                            vals = np.arange(self.type_num_classes)
+                            weights = self.type_weights
+                            if weights is None:
+                                vals, counts = torch.unique(node_assn_type, return_counts=True)
+                                weights = len(node_assn_type)/len(counts)/counts
+
                             for k, v in enumerate(vals):
                                 loss = weights[k] * self.type_lossfn(node_pred_type[node_assn_type==v],
                                                                      node_assn_type[node_assn_type==v])
